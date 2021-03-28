@@ -196,6 +196,28 @@ static int applib_registerUi(lua_State* L) {
     return 1;
 }
 
+static int applib_registerBackgroundTask(lua_State* L) {
+    Plugin* plugin = Plugin::getPluginFromLua(L);
+    if (!plugin->isInInitUi()) {
+        luaL_error(L, "registerBackgroundTask needs to be called within initUi()");
+    }
+
+    // discard any extra arguments passed in
+    lua_settop(L, 1);
+    luaL_checktype(L, 1, LUA_TSTRING);
+
+    const char* func_name = luaL_optstring(L, 1, nullptr);
+    if(!func_name ) {
+        luaL_error(L, "Background Task function runner name invalid!");
+    }
+    
+    int taskId = plugin->registerBackgroundTask(func_name);
+
+    lua_pushinteger(L, taskId);
+
+    return 1;
+}
+
 /**
  * Execute an UI action (usually internally called from Toolbar / Menu)
  * The argument consists of a Lua table with 3 keys: "action", "group" and "enabled"
@@ -896,6 +918,7 @@ static const luaL_Reg applib[] = {{"msgbox", applib_msgbox},
                                   {"setBackgroundName", applib_setBackgroundName},
                                   {"scaleTextElements", applib_scaleTextElements},
                                   {"getDisplayDpi", applib_getDisplayDpi},
+                                  {"registerBackgroundTask", applib_registerBackgroundTask},
                                   // Placeholder
                                   //	{"MSG_BT_OK", nullptr},
 
