@@ -101,7 +101,9 @@ public:
     ///@return The main controller
     auto getControl() const -> Control*;
 
-    void registerBackgroundTask(std::string func_name);
+    /// Register a background task
+    /// @return Internal ID, cannot be used, yet
+    auto registerBackgroundTask(std::string func_name) -> size_t;
 
 private:
     /// Load ini file

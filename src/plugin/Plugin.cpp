@@ -261,7 +261,7 @@ auto Plugin::callFunction(const std::string& fnc, bool ui_thread) -> bool {
 
 auto Plugin::isValid() const -> bool { return valid; }
 
-void Plugin::registerBackgroundTask(std::string func_name) {
+auto Plugin::registerBackgroundTask(std::string func_name) -> size_t {
     backgroundTasks.emplace_back([this, func_name = std::move(func_name)]() {
         while (!stopRequested) {
             // lock with low priority
@@ -270,6 +270,7 @@ void Plugin::registerBackgroundTask(std::string func_name) {
             callFunction(func_name, false);
         }
     });
+    return backgroundTasks.size() - 1;
 }
 
 #endif
