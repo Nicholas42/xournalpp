@@ -21,6 +21,8 @@
 
 #include <gtk/gtk.h>
 
+#include "util/PriorityMutex.h"
+
 #include "filesystem.h"
 
 extern "C" {
@@ -99,6 +101,8 @@ public:
     ///@return The main controller
     auto getControl() const -> Control*;
 
+    void registerBackgroundTask(std::string func_name);
+
 private:
     /// Load ini file
     void loadIni();
@@ -120,6 +124,7 @@ private:
     Control* control;                              ///< The main controller
     std::unique_ptr<lua_State, LuaDeleter> lua{};  ///< Lua engine
     std::vector<MenuEntry> menuEntries;            ///< All registered menu entries
+    std::vector<std::thread> backgroundTasks;
 
     std::string name;             ///< Plugin name
     std::string description;      ///< Description of the plugin
@@ -131,6 +136,8 @@ private:
     bool defaultEnabled = false;  ///< The plugin is default enabled
     bool inInitUi = false;        ///< Flag to check if init ui is currently running
     bool valid = false;           ///< Flag if the plugin is valid / correct loaded
+    bool stopRequested = false;   ///< Flag to inform background tasks to terminate
+    Util::PriorityMutex mutex;    ///< A mutex that can be locked with priority by the UI-Thread
 };
 
 #else

@@ -43,6 +43,7 @@ void Plugin::registerToolbar() {
     }
 
     inInitUi = true;
+    auto lock = mutex.seniorLock();
 
     lua_getglobal(lua.get(), "initUi");
     if (lua_isfunction(lua.get(), -1) == 1) {
@@ -239,6 +240,7 @@ void Plugin::loadScript() {
 }
 
 auto Plugin::callFunction(const std::string& fnc) -> bool {
+    auto lock = mutex.seniorLock();
     lua_getglobal(lua.get(), fnc.c_str());
 
     // Run the function
@@ -256,5 +258,14 @@ auto Plugin::callFunction(const std::string& fnc) -> bool {
 }
 
 auto Plugin::isValid() const -> bool { return valid; }
+
+void Plugin::registerBackgroundTask(std::string func_name) {
+    backgroundTasks.emplace_back([this, func_name = std::move(func_name)]() {
+        while (!stopRequested) {
+            auto lock = mutex.juniorLock();
+            callFunction(func_name);
+        }
+    });
+}
 
 #endif
