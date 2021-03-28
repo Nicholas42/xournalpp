@@ -207,10 +207,10 @@ static int applib_registerBackgroundTask(lua_State* L) {
     luaL_checktype(L, 1, LUA_TSTRING);
 
     const char* func_name = luaL_optstring(L, 1, nullptr);
-    if(!func_name ) {
+    if (!func_name) {
         luaL_error(L, "Background Task function runner name invalid!");
     }
-    
+
     int taskId = plugin->registerBackgroundTask(func_name);
 
     lua_pushinteger(L, taskId);

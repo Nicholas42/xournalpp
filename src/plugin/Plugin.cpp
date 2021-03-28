@@ -275,7 +275,7 @@ auto Plugin::registerBackgroundTask(std::string func_name) -> size_t {
 
 Plugin::~Plugin() {
     stopRequested = true;
-    std::for_each(begin(backgroundTasks), end(backgroundTasks), [](auto &thread){thread.join();});
+    std::for_each(begin(backgroundTasks), end(backgroundTasks), [](auto& thread) { thread.join(); });
 }
 
 #endif
