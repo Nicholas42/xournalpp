@@ -9,7 +9,7 @@ auto PriorityMutex::seniorLock() -> std::unique_lock<std::mutex> {
 auto PriorityMutex::juniorLock() -> std::unique_lock<std::mutex> { return std::unique_lock<std::mutex>{lowPriority}; }
 
 
-auto PriorityMutex::lowPriorityLock() -> double_lock {
+auto PriorityMutex::lowPriorityLock() -> DoubleLock {
     auto lowPriorityLock = juniorLock();
     return std::make_pair(std::move(lowPriorityLock), seniorLock());
 }

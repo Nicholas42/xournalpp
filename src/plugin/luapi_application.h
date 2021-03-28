@@ -196,6 +196,14 @@ static int applib_registerUi(lua_State* L) {
     return 1;
 }
 
+/**
+ * Allow to register background tasks, this needs to be called from registerUI. All share a lua state with the Plugin.
+ *
+ * Example: app.registerBackgroundTask("workerFunction") registers a function named "workerFunction". This function will
+ * be called in a loop until the program shuts down. The called function cannot be interrupted from C++. Hence it should
+ * have a short runtime, otherwise, it will block shutdown. Menupoints and background tasks of the same Plugin can block
+ * each other and thereby the UI-Thread.
+ */
 static int applib_registerBackgroundTask(lua_State* L) {
     Plugin* plugin = Plugin::getPluginFromLua(L);
     if (!plugin->isInInitUi()) {
@@ -206,12 +214,12 @@ static int applib_registerBackgroundTask(lua_State* L) {
     lua_settop(L, 1);
     luaL_checktype(L, 1, LUA_TSTRING);
 
-    const char* func_name = luaL_optstring(L, 1, nullptr);
-    if (!func_name) {
+    const char* funcName = luaL_optstring(L, 1, nullptr);
+    if (!funcName) {
         luaL_error(L, "Background Task function runner name invalid!");
     }
 
-    int taskId = plugin->registerBackgroundTask(func_name);
+    int taskId = plugin->registerBackgroundTask(funcName);
 
     lua_pushinteger(L, taskId);
 
