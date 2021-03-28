@@ -1,6 +1,7 @@
 #include "Plugin.h"
 #ifdef ENABLE_PLUGINS
 
+#include <optional>
 #include <utility>
 
 #include "config.h"
@@ -239,8 +240,9 @@ void Plugin::loadScript() {
     }
 }
 
-auto Plugin::callFunction(const std::string& fnc) -> bool {
-    auto lock = mutex.seniorLock();
+auto Plugin::callFunction(const std::string& fnc, bool ui_thread) -> bool {
+    // Do not lock in UI Thread during init, since it is already locked.
+    auto lock = inInitUi && ui_thread ? std::nullopt : std::optional{mutex.seniorLock()};
     lua_getglobal(lua.get(), fnc.c_str());
 
     // Run the function
@@ -262,8 +264,10 @@ auto Plugin::isValid() const -> bool { return valid; }
 void Plugin::registerBackgroundTask(std::string func_name) {
     backgroundTasks.emplace_back([this, func_name = std::move(func_name)]() {
         while (!stopRequested) {
+            // lock with low priority
             auto lock = mutex.juniorLock();
-            callFunction(func_name);
+            // acquire lock unconditionally before calling the function.
+            callFunction(func_name, false);
         }
     });
 }

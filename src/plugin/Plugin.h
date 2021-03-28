@@ -108,7 +108,7 @@ private:
     void loadIni();
 
     /// Execute lua function
-    auto callFunction(const std::string& fnc) -> bool;
+    auto callFunction(const std::string& fnc, bool ui_thread = true) -> bool;
 
     /// Load custom Lua Libraries
     static void registerXournalppLibs(lua_State* luaPtr);
