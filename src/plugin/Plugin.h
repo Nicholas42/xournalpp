@@ -54,6 +54,8 @@ class Plugin final {
 public:
     Plugin(Control* control, std::string name, fs::path path);
 
+    ~Plugin();
+
 public:
     /// Load the plugin script
     void loadScript();
